@@ -151,6 +151,8 @@ int cmd_rmdir(char *name) {
     for (int i = 0; i < cwd->child_count; i++) {
         vfile *c = cwd->children[i];
         if (c->type == T_DIR && strcmp(c->name, name) == 0) {
+            if (c->child_count != 0)
+                return E_ERROR;
             remove_child(cwd, i);
             return E_SUCCESS;
         }
