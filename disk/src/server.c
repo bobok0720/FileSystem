@@ -20,8 +20,18 @@ int handle_i(tcp_buffer *wb, char *args, int len) {
 }
 
 int handle_r(tcp_buffer *wb, char *args, int len) {
-    int cyl;
-    int sec;
+    int cyl = 0;
+    int sec = 0;
+
+    char *tok = strtok(args, " ");
+    if (tok) {
+        cyl = atoi(tok);
+        tok = strtok(NULL, " ");
+        if (tok) {
+            sec = atoi(tok);
+        }
+    }
+
     char buf[512];
     if (cmd_r(cyl, sec, buf) == 0) {
         reply_with_yes(wb, buf, 512);
@@ -32,10 +42,28 @@ int handle_r(tcp_buffer *wb, char *args, int len) {
 }
 
 int handle_w(tcp_buffer *wb, char *args, int len) {
-    int cyl;
-    int sec;
-    int datalen;
-    char *data;
+    int cyl = 0;
+    int sec = 0;
+    int datalen = 0;
+    char *data = NULL;
+
+    char *tok = strtok(args, " ");
+    if (tok) {
+        cyl = atoi(tok);
+        tok = strtok(NULL, " ");
+        if (tok) {
+            sec = atoi(tok);
+            tok = strtok(NULL, " ");
+            if (tok) {
+                datalen = atoi(tok);
+                data = strtok(NULL, "");
+            }
+        }
+    }
+
+    if (data == NULL) {
+        data = "";
+    }
 
     if (cmd_w(cyl, sec, datalen, data) == 0) {
         reply_with_yes(wb, NULL, 0);
