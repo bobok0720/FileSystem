@@ -84,7 +84,20 @@ static int handle_ls(tcp_buffer *wb, char *args, int len) {
     entry *entries = NULL;
     int n = 0;
     if (cmd_ls(&entries, &n) == E_SUCCESS) {
-        reply_with_yes(wb, NULL, 0);
+        size_t total = 0;
+        for (int i = 0; i < n; i++) total += 2 + strlen(entries[i].name) + 1;
+        char *buf = NULL;
+        if (total > 0) {
+            buf = malloc(total);
+            char *p = buf;
+            for (int i = 0; i < n; i++) {
+                char type = entries[i].type == T_DIR ? 'D' : 'F';
+                int w = sprintf(p, "%c %s\n", type, entries[i].name);
+                p += w;
+            }
+        }
+        reply_with_yes(wb, buf ? buf : "", total);
+        free(buf);
     } else {
         reply_with_no(wb, NULL, 0);
     }

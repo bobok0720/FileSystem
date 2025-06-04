@@ -46,6 +46,14 @@ mt_test(test_cmd_ls) {
     mt_assert(exist("a", T_FILE));
     mt_assert(exist("b", T_FILE));
     mt_assert(exist("c", T_DIR));
+    char buf[64] = "";
+    for (int i = 0; i < n2; i++) {
+        char line[32];
+        snprintf(line, sizeof(line), "%c %s\n",
+                 entries2[i].type == T_DIR ? 'D' : 'F', entries2[i].name);
+        strcat(buf, line);
+    }
+    mt_assert(strcmp(buf, "F a\nF b\nD c\n") == 0);
     free(entries2);
     return 0;
 }
