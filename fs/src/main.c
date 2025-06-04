@@ -97,6 +97,10 @@ int handle_ls(char *args) {
         return 0;
     }
     ReplyYes();
+    for (int i = 0; i < n; i++) {
+        char type = entries[i].type == T_DIR ? 'D' : 'F';
+        printf("%c %s\n", type, entries[i].name);
+    }
     free(entries);
     return 0;
 }
