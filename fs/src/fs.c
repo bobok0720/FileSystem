@@ -180,6 +180,7 @@ int cmd_cat(char *name, uchar **buf, uint *len) {
     *buf = malloc(*len + 1);
     if (!*buf && *len) return E_ERROR;
     memcpy(*buf, c->data, *len);
+    (*buf)[*len] = '\0';
     return E_SUCCESS;
 }
 
