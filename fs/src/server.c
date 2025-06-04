@@ -3,21 +3,177 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "fs.h"
 #include "log.h"
+#include "server.h"
 #include "tcp_utils.h"
+
+/*
+ * Command handlers
+ *
+ * These handlers mimic the behaviour of the ones in main.c but send the
+ * response through the tcp_buffer provided by the network library.
+ */
+
+static int handle_f(tcp_buffer *wb, char *args, int len) {
+    if (cmd_f(0, 0) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_mk(tcp_buffer *wb, char *args, int len) {
+    if (cmd_mk(NULL, 0) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_mkdir(tcp_buffer *wb, char *args, int len) {
+    if (cmd_mkdir(NULL, 0) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_rm(tcp_buffer *wb, char *args, int len) {
+    if (cmd_rm(NULL) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_cd(tcp_buffer *wb, char *args, int len) {
+    if (cmd_cd(NULL) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_rmdir(tcp_buffer *wb, char *args, int len) {
+    if (cmd_rmdir(NULL) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_ls(tcp_buffer *wb, char *args, int len) {
+    entry *entries = NULL;
+    int n = 0;
+    if (cmd_ls(&entries, &n) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    free(entries);
+    return 0;
+}
+
+static int handle_cat(tcp_buffer *wb, char *args, int len) {
+    uchar *buf = NULL;
+    uint l;
+    if (cmd_cat(NULL, &buf, &l) == E_SUCCESS) {
+        reply_with_yes(wb, (char *)buf, l);
+        free(buf);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_w(tcp_buffer *wb, char *args, int len) {
+    if (cmd_w(NULL, 0, NULL) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_i(tcp_buffer *wb, char *args, int len) {
+    if (cmd_i(NULL, 0, 0, NULL) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_d(tcp_buffer *wb, char *args, int len) {
+    if (cmd_d(NULL, 0, 0) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+static int handle_e(tcp_buffer *wb, char *args, int len) {
+    const char *msg = "Bye!";
+    reply(wb, msg, strlen(msg) + 1);
+    return -1;
+}
+
+static int handle_login(tcp_buffer *wb, char *args, int len) {
+    if (cmd_login(0) == E_SUCCESS) {
+        reply_with_yes(wb, NULL, 0);
+    } else {
+        reply_with_no(wb, NULL, 0);
+    }
+    return 0;
+}
+
+/* command table */
+static struct {
+    const char *name;
+    int (*handler)(tcp_buffer *, char *, int);
+} cmd_table[] = {
+    {"f", handle_f},      {"mk", handle_mk},  {"mkdir", handle_mkdir},
+    {"rm", handle_rm},    {"cd", handle_cd},  {"rmdir", handle_rmdir},
+    {"ls", handle_ls},    {"cat", handle_cat}, {"w", handle_w},
+    {"i", handle_i},      {"d", handle_d},    {"e", handle_e},
+    {"login", handle_login},
+};
 
 #define NCMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
 
 void on_connection(int id) {
-    // some code that are executed when a new client is connected
+    /* currently unused */
 }
 
 int on_recv(int id, tcp_buffer *wb, char *msg, int len) {
+    char *p = strtok(msg, " \r\n");
+    int ret = 1;
+    for (int i = 0; i < NCMD; i++)
+        if (p && strcmp(p, cmd_table[i].name) == 0) {
+            ret = cmd_table[i].handler(wb, p + strlen(p) + 1,
+                                      len - strlen(p) - 1);
+            break;
+        }
+    if (ret == 1) {
+        static char unk[] = "Unknown command";
+        buffer_append(wb, unk, sizeof(unk));
+    }
+    if (ret < 0) {
+        return -1;
+    }
     return 0;
 }
 
 void cleanup(int id) {
-    // some code that are executed when a client is disconnected
+    /* currently unused */
 }
 
 FILE *log_file;
@@ -25,10 +181,10 @@ FILE *log_file;
 int main(int argc, char *argv[]) {
     log_init("fs.log");
 
-    // command
     tcp_server server = server_init(666, 1, on_connection, on_recv, cleanup);
     server_run(server);
 
-    // never reached
+    /* never reached */
     log_close();
 }
+
