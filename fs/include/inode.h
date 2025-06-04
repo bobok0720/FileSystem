@@ -5,6 +5,10 @@
 
 #define NDIRECT 10  // Direct blocks, you can change this value
 
+// addresses per block
+#define APB (BSIZE / sizeof(uint))
+
+// maximum number of blocks a file can reference
 #define MAXFILEB (NDIRECT + APB + APB * APB)
 
 enum {
@@ -33,6 +37,7 @@ typedef struct {
     uint size;
     uint blocks;
     uint addrs[NDIRECT + 2];
+    uchar *data;  // pointer to file data in memory
     // ...
     // ...
     // Other fields can be added as needed
