@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-#define NDIRECT 10  // Direct blocks, you can change this value
+#define NDIRECT 11  // Direct blocks, you can change this value
 
 // addresses per block
 #define APB (BSIZE / sizeof(uint))
