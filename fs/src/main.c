@@ -14,12 +14,18 @@ int ncyl, nsec;
 
 #define ReplyYes()       \
     do {                 \
-        printf("Yes\n"); \
+        /* On success we mimic typical shell behaviour by printing       \
+         * nothing.  We still log the successful operation for the test  \
+         * suite.                                                         \
+         */                                                            \
         Log("Success");  \
     } while (0)
 #define ReplyNo(x)      \
     do {                \
-        printf("No\n"); \
+        /* Instead of printing the literal "No" we display a more        \
+         * conventional error message while keeping the warning log.     \
+         */                                                            \
+        fprintf(stderr, "%s\n", x); \
         Warn(x);        \
     } while (0)
 
