@@ -1,12 +1,17 @@
-SUB_DIR = ./disk ./fs
+SUBDIRS := disk fs
 
-all:
-	@for n in $(SUB_DIR); do $(MAKE) -C $$n || exit 1; done
+all: $(SUBDIRS)
+
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 test:
-	@for n in $(SUB_DIR); do $(MAKE) -C $$n test || exit 1; done
+	@for d in $(SUBDIRS); do $(MAKE) -C $$d test || exit 1; done
 
 clean:
-	@for n in $(SUB_DIR); do $(MAKE) -C $$n clean || exit 1; done
+	@for d in $(SUBDIRS); do $(MAKE) -C $$d clean || exit 1; done
 
-.PHONY: all test clean
+run:
+	@for d in $(SUBDIRS); do $(MAKE) -C $$d run || exit 1; done
+
+.PHONY: all test clean run $(SUBDIRS)
