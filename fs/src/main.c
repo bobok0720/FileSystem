@@ -34,9 +34,11 @@ int handle_f(char *args) {
 }
 
 int handle_mk(char *args) {
-    char *name;
+    char *name = strtok(args, " ");
+    char *mode_str = strtok(NULL, " ");
     short mode = 0;
-    if (cmd_mk(name, mode) == E_SUCCESS) {
+    if (mode_str) mode = (short)strtol(mode_str, NULL, 0);
+    if (name && cmd_mk(name, mode) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to create file");
@@ -45,9 +47,11 @@ int handle_mk(char *args) {
 }
 
 int handle_mkdir(char *args) {
-    char *name;
+    char *name = strtok(args, " ");
+    char *mode_str = strtok(NULL, " ");
     short mode = 0;
-    if (cmd_mkdir(name, mode) == E_SUCCESS) {
+    if (mode_str) mode = (short)strtol(mode_str, NULL, 0);
+    if (name && cmd_mkdir(name, mode) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to create file");
@@ -56,8 +60,8 @@ int handle_mkdir(char *args) {
 }
 
 int handle_rm(char *args) {
-    char *name;
-    if (cmd_rm(name) == E_SUCCESS) {
+    char *name = strtok(args, " ");
+    if (name && cmd_rm(name) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to remove file");
@@ -66,8 +70,8 @@ int handle_rm(char *args) {
 }
 
 int handle_cd(char *args) {
-    char *name;
-    if (cmd_cd(name) == E_SUCCESS) {
+    char *name = strtok(args, " ");
+    if (name && cmd_cd(name) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to change directory");
@@ -76,8 +80,8 @@ int handle_cd(char *args) {
 }
 
 int handle_rmdir(char *args) {
-    char *name;
-    if (cmd_rmdir(name) == E_SUCCESS) {
+    char *name = strtok(args, " ");
+    if (name && cmd_rmdir(name) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to remove directory");
@@ -98,11 +102,11 @@ int handle_ls(char *args) {
 }
 
 int handle_cat(char *args) {
-    char *name;
+    char *name = strtok(args, " ");
 
     uchar *buf = NULL;
     uint len;
-    if (cmd_cat(name, &buf, &len) == E_SUCCESS) {
+    if (name && cmd_cat(name, &buf, &len) == E_SUCCESS) {
         ReplyYes();
         printf("%s\n", buf);
         free(buf);
@@ -113,10 +117,13 @@ int handle_cat(char *args) {
 }
 
 int handle_w(char *args) {
-    char *name;
-    uint len;
-    char *data;
-    if (cmd_w(name, len, data) == E_SUCCESS) {
+    char *name = strtok(args, " ");
+    char *len_str = strtok(NULL, " ");
+    uint len = 0;
+    if (len_str) len = strtoul(len_str, NULL, 0);
+    char *data = strtok(NULL, "");
+    if (!data) data = "";
+    if (name && cmd_w(name, len, data) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to write file");
@@ -125,11 +132,15 @@ int handle_w(char *args) {
 }
 
 int handle_i(char *args) {
-    char *name;
-    uint pos;
-    uint len;
-    char *data;
-    if (cmd_i(name, pos, len, data) == E_SUCCESS) {
+    char *name = strtok(args, " ");
+    char *pos_str = strtok(NULL, " ");
+    char *len_str = strtok(NULL, " ");
+    uint pos = 0, len = 0;
+    if (pos_str) pos = strtoul(pos_str, NULL, 0);
+    if (len_str) len = strtoul(len_str, NULL, 0);
+    char *data = strtok(NULL, "");
+    if (!data) data = "";
+    if (name && cmd_i(name, pos, len, data) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to write file");
@@ -138,10 +149,13 @@ int handle_i(char *args) {
 }
 
 int handle_d(char *args) {
-    char *name;
-    uint pos;
-    uint len;
-    if (cmd_d(name, pos, len) == E_SUCCESS) {
+    char *name = strtok(args, " ");
+    char *pos_str = strtok(NULL, " ");
+    char *len_str = strtok(NULL, " ");
+    uint pos = 0, len = 0;
+    if (pos_str) pos = strtoul(pos_str, NULL, 0);
+    if (len_str) len = strtoul(len_str, NULL, 0);
+    if (name && cmd_d(name, pos, len) == E_SUCCESS) {
         ReplyYes();
     } else {
         ReplyNo("Failed to delete file");
@@ -156,7 +170,9 @@ int handle_e(char *args) {
 }
 
 int handle_login(char *args) {
-    int uid;
+    char *uid_str = strtok(args, " ");
+    int uid = 0;
+    if (uid_str) uid = atoi(uid_str);
     if (cmd_login(uid) == E_SUCCESS) {
         ReplyYes();
     } else {
