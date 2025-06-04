@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "tcp_utils.h"
+#include "tcp_client.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

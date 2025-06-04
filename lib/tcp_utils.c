@@ -1,4 +1,5 @@
 #include "tcp_utils.h"
+#include "tcp_client.h"
 
 #include <arpa/inet.h>
 #include <assert.h>
