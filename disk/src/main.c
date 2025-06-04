@@ -15,12 +15,16 @@ int handle_i(char *args) {
 }
 
 int handle_r(char *args) {
-    // Parse the arguments
-    int cyl;
-    int sec;
-    char buf[512];
+    int cyl = 0;
+    int sec = 0;
+    char *tok = strtok(args, " ");
+    if (tok) {
+        cyl = atoi(tok);
+        tok = strtok(NULL, " ");
+        if (tok) sec = atoi(tok);
+    }
 
-    // Call the cmd_r function
+    char buf[512];
     if (cmd_r(cyl, sec, buf) == 0) {
         printf("Yes\n");
         for (int i = 0; i < 512; i++) {
@@ -34,10 +38,26 @@ int handle_r(char *args) {
 }
 
 int handle_w(char *args) {
-    int cyl;
-    int sec;
-    int len;
-    char *data;
+    int cyl = 0;
+    int sec = 0;
+    int len = 0;
+    char *data = NULL;
+
+    char *tok = strtok(args, " ");
+    if (tok) {
+        cyl = atoi(tok);
+        tok = strtok(NULL, " ");
+        if (tok) {
+            sec = atoi(tok);
+            tok = strtok(NULL, " ");
+            if (tok) {
+                len = atoi(tok);
+                data = strtok(NULL, "");
+            }
+        }
+    }
+
+    if (data == NULL) data = "";
 
     if (cmd_w(cyl, sec, len, data) == 0) {
         printf("Yes\n");
