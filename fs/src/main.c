@@ -54,7 +54,7 @@ int handle_mkdir(char *args) {
     if (name && cmd_mkdir(name, mode) == E_SUCCESS) {
         ReplyYes();
     } else {
-        ReplyNo("Failed to create file");
+        ReplyNo("Failed to create directory");
     }
     return 0;
 }
