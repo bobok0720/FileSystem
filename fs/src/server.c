@@ -93,7 +93,14 @@ static int handle_ls(tcp_buffer *wb, char *args, int len) {
             char *p = buf;
             for (int i = 0; i < n; i++) {
                 char type = entries[i].type == T_DIR ? 'D' : 'F';
-                int w = sprintf(p, "%c %s\n", type, entries[i].name);
+                size_t left = total + 1 - (p - buf);
+                int w = snprintf(p, left, "%c %s\n", type, entries[i].name);
+                if (w < 0 || (size_t)w >= left) {
+                    free(buf);
+                    free(entries);
+                    reply_with_no(wb, NULL, 0);
+                    return 0;
+                }
                 p += w;
             }
         }
