@@ -88,7 +88,8 @@ static int handle_ls(tcp_buffer *wb, char *args, int len) {
         for (int i = 0; i < n; i++) total += 2 + strlen(entries[i].name) + 1;
         char *buf = NULL;
         if (total > 0) {
-            buf = malloc(total);
+            /* +1 to accommodate the trailing null byte from sprintf */
+            buf = malloc(total + 1);
             char *p = buf;
             for (int i = 0; i < n; i++) {
                 char type = entries[i].type == T_DIR ? 'D' : 'F';
