@@ -28,6 +28,7 @@ static vfile *create_vfile(const char *name, short mode, short type, vfile *pare
     vfile *vf = calloc(1, sizeof(vfile));
     if (!vf) return NULL;
     strncpy(vf->name, name, MAXNAME - 1);
+    vf->name[MAXNAME - 1] = '\0';
     vf->mode = mode;
     vf->type = type;
     vf->parent = parent;
